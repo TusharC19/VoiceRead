@@ -24,14 +24,15 @@
 1. ✨ [Introduction](#introduction)
 2. ⚙️ [Tech Stack](#tech-stack)
 3. 🔋 [Features](#features)
-4. 🤸 [Quick Start](#quick-start)
-5. 🔗 [Assets](#links)
+4. 🗺️ [Roadmap](#roadmap)
+5. 🤸 [Quick Start](#quick-start)
+6. 🔗 [Assets](#links)
 
 
 
 ## <a name="introduction">✨ Introduction</a>
 
-VoiceRead is an AI-powered platform that lets you have real-time voice conversations with your books. Built with Next.js 16, Vapi, and MongoDB, it transforms PDFs into interactive entities using natural voice synthesis. Choose from custom ElevenLabs personas to chat with your library, request summaries, and view live transcripts—all wrapped in a sleek Shadcn UI with Clerk authentication. 
+VoiceRead is an AI-powered platform that lets you have real-time voice conversations with your books. Built with Next.js 16, Vapi, and MongoDB, it lets you upload a PDF, pick an ElevenLabs voice persona, and ask questions about the book out loud. Retrieval currently runs on MongoDB text search (with a regex fallback), which returns relevant passages to the configured Vapi assistant during the call.
 
 
 
@@ -39,35 +40,44 @@ VoiceRead is an AI-powered platform that lets you have real-time voice conversat
 
 - **[Clerk](https://jsm.dev/books-clerk)** is a comprehensive user management and authentication platform. It provides secure, pre-built components for email and social logins, enabling seamless session management and protected routes with minimal configuration.
 
-- **[ElevenLabs](https://elevenlabs.io/docs)** is an advanced AI audio platform providing lifelike text-to-speech. It powers the voice previews in Bookified, allowing users to hear and select from a variety of natural-sounding AI personas before starting a conversation.
+- **[ElevenLabs](https://elevenlabs.io/docs)** is an advanced AI audio platform providing lifelike text-to-speech. It powers the selectable voice personas in VoiceRead's voice calls.
 
-- **[MongoDB](https://www.mongodb.com/docs/)** is a flexible, document-based NoSQL database designed for scalability and developer ease. Combined with Mongoose, it serves as the core storage for user libraries, book metadata, and conversation transcripts.
+- **[MongoDB](https://www.mongodb.com/docs/)** is a flexible, document-based NoSQL database designed for scalability and developer ease. Combined with Mongoose, it stores book metadata, text chunks, and voice-session usage records.
 
-- **[Next.js](https://nextjs.org/docs)** is a powerful React framework for building full-stack web applications. It handles the core application logic, server-side rendering, and API routes, enabling a fast and responsive interface for the Bookified platform.
+- **[Next.js](https://nextjs.org/docs)** is a powerful React framework for building full-stack web applications. It handles the core application logic, server actions, API routes, and UI for VoiceRead.
 
-- **[Shadcn UI](https://ui.shadcn.com/)** is a collection of re-usable, accessible components built with Tailwind CSS and Radix UI. It allows for the creation of a clean, modular, and professional-grade user interface that is easy to customize and theme.
+- **[Shadcn UI](https://ui.shadcn.com/)** is a collection of re-usable, accessible components built with Tailwind CSS and Radix UI. It powers VoiceRead's interface.
 
-- **[TypeScript](https://www.typescriptlang.org/)** is a superset of JavaScript that adds static typing, providing better tooling, code quality, and error detection. It ensures the application remains maintainable and robust as the codebase scales.
+- **[TypeScript](https://www.typescriptlang.org/)** is a superset of JavaScript that adds static typing, providing better tooling, code quality, and error detection.
 
-- **[Vapi](https://jsm.dev/books-vapi)** is a specialized Voice AI platform that enables real-time, low-latency conversational audio. It serves as the primary engine for Bookified, allowing users to have seamless, back-and-forth verbal interactions with their uploaded content.
+- **[Vapi](https://jsm.dev/books-vapi)** is a specialized Voice AI platform that enables real-time conversational audio. It orchestrates the voice call and invokes VoiceRead's retrieval tool endpoint during a conversation.
 
 ## <a name="features">🔋 Features</a>
 
-👉 **PDF Upload & Ingestion**: Seamlessly upload PDF books with automated text extraction, intelligent chunking, and high-dimensional embeddings for precise context retrieval.
+👉 **PDF Upload & Ingestion**: Upload a PDF book; text is extracted in the browser via PDF.js and split into 500-word overlapping chunks stored in MongoDB.
 
-👉 **Voice-First Conversations**: Engage in natural, real-time voice dialogues with your uploaded books, allowing you to ask questions or explore complex concepts verbally via Vapi.
+👉 **Voice Conversations**: Start a real-time voice call about an uploaded book via the Vapi SDK, with live call-state tracking (connecting, listening, speaking).
 
-👉 **AI Voice Personas**: Choose from a variety of distinct AI personalities and hear instant high-fidelity previews powered by ElevenLabs to find the perfect reading companion.
+👉 **AI Voice Personas**: Choose from configurable ElevenLabs voices for the assistant's speech output.
 
-👉 **Smart Summaries & Insights**: Quickly extract the essence of any chapter or request deep-dive summaries, making long-form content more accessible and digestible.
+👉 **Keyword-Based Retrieval**: A MongoDB text-search endpoint (with a regex keyword fallback) returns up to three relevant passages per query for the active book.
 
-👉 **Session Transcripts**: Keep a complete record of every vocal interaction with auto-generated text transcripts, ensuring you never lose a key insight from your discussions.
+👉 **Live Transcripts**: Partial and final speech transcripts are displayed in real time during a call (kept in client state for the session; not yet persisted to the database).
 
-👉 **Library Management**: Effortlessly organize and search through your personal uploads or the global collection with a high-performance search interface.
+👉 **Library Management**: Browse and search your uploaded books.
 
-👉 **Auth & Subscription**: Secure user access via email and social login, paired with a robust billing system to manage premium features and platform subscriptions.
+👉 **Auth & Subscription Tiers**: Clerk-based authentication with Free/Standard/Pro plans enforcing book count, session count, and per-session duration limits.
 
-And many more, including code architecture and reusability.
+## <a name="roadmap">🗺️ Roadmap</a>
+
+The following are planned improvements, not yet implemented:
+
+- Semantic/embedding-based retrieval (current retrieval is keyword-based, not vector search)
+- AI-generated chapter/book summaries
+- Persisted transcript history (currently transcripts live only in browser state during the call)
+- Server-side resource ownership checks on segment/session actions
+- Webhook authentication on the retrieval tool endpoint
+- OCR support for scanned (image-only) PDFs
 
 ## <a name="quick-start">🤸 Quick Start</a>
 
@@ -84,8 +94,8 @@ Make sure you have the following installed on your machine:
 **Cloning the Repository**
 
 ```bash
-git clone https://github.com/TusharC19/Bookified.git
-cd Bookified
+git clone https://github.com/TusharC19/VoiceRead.git
+cd VoiceRead
 ```
 
 **Installation**
@@ -120,16 +130,16 @@ MONGODB_URI=
 
 # VAPI
 NEXT_PUBLIC_VAPI_API_KEY=
+NEXT_PUBLIC_ASSISTANT_ID=
 VAPI_SERVER_SECRET=
-
-# Google Gemini API for embeddings
-GOOGLE_GEMINI_API_KEY=
 
 # ELEVENLABS
 ELEVENLABS_API_KEY=
 ```
 
-Replace the placeholder values with your real credentials. You can get these by signing up at: [**Clerk**](https://clerk.com), [**Vercel**](https://vercel.com), [**MongoDB**](https://www.mongodb.com), [**Vapi**](https://vapi.ai), [**Google AI Studio**](https://aistudio.google.com), [**ElevenLabs**](https://elevenlabs.io).
+Replace the placeholder values with your real credentials. You can get these by signing up at: [**Clerk**](https://clerk.com), [**Vercel**](https://vercel.com), [**MongoDB**](https://www.mongodb.com), [**Vapi**](https://vapi.ai), [**ElevenLabs**](https://elevenlabs.io).
+
+> Note: the assistant's model, system prompt, transcriber, and retrieval-tool registration are configured in the Vapi dashboard, not in this repository.
 
 **Running the Project**
 
@@ -142,4 +152,3 @@ Open [http://localhost:3000](http://localhost:3000) in your browser to view the 
 ## <a name="links">🔗 Assets</a>
 
 Assets and snippets used in the project can be found in the codebase.
-
